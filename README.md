@@ -23,6 +23,8 @@ npm run storybook
 
 ### To install and run applitools tests
 
+- Requires the APPLITOOLS_API_KEY in your env variables.
+
 ```
 npm i @applitools/eyes.storybook
 npx eyes-storybook --build --debug
