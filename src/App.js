@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import styled, { css } from "react-emotion";
 import "./App.css";
+import posed, { PoseGroup } from "react-pose";
 
 const api =
   "https://api.themoviedb.org/3/movie/popular?api_key=545627a88a5efecc1bd8a6c56f801111&language=en-US&page=1";
@@ -22,6 +23,7 @@ video: false
 vote_average: 6.8
 vote_count: 115
 */
+var Item = posed.div();
 export class Movie extends Component {
   render() {
     return (
@@ -43,9 +45,13 @@ const StyledApp = styled("div")`
 export class Movies extends Component {
   render() {
     return (
-      <React.Fragment>
-        {this.props.movies.map((m, i) => <Movie movie={m} key={i} />)}
-      </React.Fragment>
+      <PoseGroup>
+        {this.props.movies.map(m => (
+          <Item key={m.id}>
+            <Movie movie={m} />
+          </Item>
+        ))}
+      </PoseGroup>
     );
   }
 }
@@ -53,7 +59,7 @@ export class Movies extends Component {
 export class App extends Component {
   constructor() {
     super();
-    this.state = { movies: [] };
+    this.state = { movies: [], query: "" };
   }
   async componentDidMount() {
     const res = await fetch(api);
@@ -61,7 +67,13 @@ export class App extends Component {
     console.log(json);
     this.setState({ movies: json.results });
   }
+  queryUpdate = e => {
+    this.setState({ query: e.target.value });
+  };
   render() {
+    const filteredMovies = this.state.movies.filter(
+      x => x.title.toLowerCase().indexOf(this.state.query) > -1
+    );
     return (
       <div
         className={css`
@@ -74,12 +86,13 @@ export class App extends Component {
         <input
           type="text"
           id="query"
+          onChange={this.queryUpdate}
           className={css`
             margin: 20px;
           `}
         />
         <StyledApp>
-          <Movies movies={this.state.movies} />
+          <Movies movies={filteredMovies} />
         </StyledApp>
       </div>
     );
